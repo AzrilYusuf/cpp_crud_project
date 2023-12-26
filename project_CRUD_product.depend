@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1702355723 source:d:\coding\c++\project_crud_product\main.cpp
+	<iostream>
+	<string>
+	<fstream>
+	<limits>
+
