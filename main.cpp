@@ -5,36 +5,37 @@
 
 using namespace std;
 
-struct Produk {
+struct Produk
+{
     int pk;
-    char nama [20];
+    char nama[20];
     int harga;
 };
 
-int pilihMenu(); //deklarasi fungsi
-void checkDatabase(fstream &data); //deklarasi fungsi
+int pilihMenu();                   // deklarasi fungsi
+void checkDatabase(fstream &data); // deklarasi fungsi
 
 void writeData(fstream &data, int posisi, Produk &inputProduk)
 {
-    data.seekp((posisi-1)*sizeof(Produk), ios::beg); //mencari posisi
-    data.write(reinterpret_cast<char*>(&inputProduk), sizeof(Produk));
+    data.seekp((posisi - 1) * sizeof(Produk), ios::beg); // mencari posisi
+    data.write(reinterpret_cast<char *>(&inputProduk), sizeof(Produk));
 }
 int getDataSize(fstream &data)
 {
     int start, end;
-    data.seekg(0, ios::beg); //mencari posisi dlm data dan pindah cursor didepan 0
+    data.seekg(0, ios::beg); // mencari posisi dlm data dan pindah cursor didepan 0
     start = data.tellg();
     data.seekg(0, ios::end);
     end = data.tellg();
 
-    return (end - start)/sizeof(Produk);
+    return (end - start) / sizeof(Produk);
 }
 
 Produk readData(fstream &data, int posisi)
 {
     Produk readProduk;
-    data.seekp((posisi-1)*sizeof(Produk), ios::beg); //mencari posisi
-    data.read(reinterpret_cast<char*>(&readProduk), sizeof(Produk));
+    data.seekp((posisi - 1) * sizeof(Produk), ios::beg); // mencari posisi
+    data.read(reinterpret_cast<char *>(&readProduk), sizeof(Produk));
     return readProduk;
 }
 
@@ -43,9 +44,12 @@ void addDataProduk(fstream &data)
     Produk inputProduk, lastProduk;
     int size;
     size = getDataSize(data);
-    if(size == 0){
+    if (size == 0)
+    {
         inputProduk.pk = 1;
-    } else {
+    }
+    else
+    {
         lastProduk = readData(data, size);
         inputProduk.pk = lastProduk.pk + 1;
     }
@@ -57,16 +61,18 @@ void addDataProduk(fstream &data)
     cout << "Harga Produk: ";
     cin >> inputProduk.harga;
 
-    writeData(data, size+1 , inputProduk);
+    writeData(data, size + 1, inputProduk);
 }
 
-void displayDataProduct (fstream &data) {
+void displayDataProduct(fstream &data)
+{
     Produk showProduct;
     int size;
 
     size = getDataSize(data);
 
-    for(int i = 1; i <= size; i++) {
+    for (int i = 1; i <= size; i++)
+    {
         showProduct = readData(data, i);
         std::cout << i << "\t";
         std::cout << showProduct.pk << "\t";
@@ -75,7 +81,8 @@ void displayDataProduct (fstream &data) {
     }
 }
 
-void updateDataProduct(fstream &data) {
+void updateDataProduct(fstream &data)
+{
     int nomor;
     Produk updateProduk;
 
@@ -97,7 +104,8 @@ void updateDataProduct(fstream &data) {
     writeData(data, nomor, updateProduk);
 }
 
-void deleteDataProduct (fstream &data) {
+void deleteDataProduct(fstream &data)
+{
     int nomor, size, offset;
     Produk blankProduct, temporaryProduct;
     fstream dataSementara;
@@ -111,12 +119,16 @@ void deleteDataProduct (fstream &data) {
 
     dataSementara.open("temp.dat", ios::trunc | ios::out | ios::in | ios::binary);
     offset = 0;
-    for(int i = 1; i<=size; i++) {
+    for (int i = 1; i <= size; i++)
+    {
         temporaryProduct = readData(data, i);
-        if (temporaryProduct.pk != 0) {
-            writeData(dataSementara, i-offset, temporaryProduct);
-        } else {
-            offset = offset+1;
+        if (temporaryProduct.pk != 0)
+        {
+            writeData(dataSementara, i - offset, temporaryProduct);
+        }
+        else
+        {
+            offset = offset + 1;
         }
     }
 
@@ -126,13 +138,14 @@ void deleteDataProduct (fstream &data) {
     data.close();
     data.open("data.bin", ios::out | ios::in | ios::binary);
 
-    for(int i = 1; i <= size; i++) {
+    for (int i = 1; i <= size; i++)
+    {
         temporaryProduct = readData(dataSementara, i);
         writeData(data, i, temporaryProduct);
     }
 }
 
-int main ()
+int main()
 {
     fstream data;
     checkDatabase(data);
@@ -144,43 +157,47 @@ int main ()
     {
         switch (pilihan)
         {
-            case 1 :
-                cout <<  "Menu tambah produk" << endl;
-                addDataProduk(data);
-                break;
-            case 2 :
-                cout <<  "Menu lihat produk" << endl;
-                displayDataProduct(data);
-                break;
-            case 3 :
-                cout <<  "Menu ubah produk" << endl;
-                displayDataProduct(data);
-                updateDataProduct(data);
-                displayDataProduct(data);
-                break;
-            case 4 :
-                cout <<  "Menu hapus produk" << endl;
-                displayDataProduct(data);
-                deleteDataProduct(data);
-                displayDataProduct(data);
-                break;
-            default :
-                cout << "menu tidak valid" << endl;
-                break;
+        case 1:
+            cout << "Menu tambah produk" << endl;
+            addDataProduk(data);
+            break;
+        case 2:
+            cout << "Menu lihat produk" << endl;
+            displayDataProduct(data);
+            break;
+        case 3:
+            cout << "Menu ubah produk" << endl;
+            displayDataProduct(data);
+            updateDataProduct(data);
+            displayDataProduct(data);
+            break;
+        case 4:
+            cout << "Menu hapus produk" << endl;
+            displayDataProduct(data);
+            deleteDataProduct(data);
+            displayDataProduct(data);
+            break;
+        default:
+            cout << "menu tidak valid" << endl;
+            break;
         }
 
-        label_continue:
+    label_continue:
         cout << "lanjutkan?[y/n] :";
         cin >> is_continue;
-        if(is_continue == 'y' | is_continue == 'Y') {
+        if (is_continue == 'y' | is_continue == 'Y')
+        {
             pilihan = pilihMenu();
-        } else if (is_continue == 'n' | is_continue == 'N') {
+        }
+        else if (is_continue == 'n' | is_continue == 'N')
+        {
             break;
-        } else {
+        }
+        else
+        {
             goto label_continue;
         }
     }
-
 
     return 0;
 }
@@ -200,18 +217,19 @@ int pilihMenu()
     cin >> input;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     return input;
-
 }
 
 void checkDatabase(fstream &data)
 {
     data.open("data.bin", ios::out | ios::in | ios::binary);
-    if (data.is_open()) {
+    if (data.is_open())
+    {
         cout << "database ditemukan!" << endl;
-    } else {
+    }
+    else
+    {
         cout << "database belum ada, buat baru" << endl;
-        data.close ();
+        data.close();
         data.open("data.bin", ios::trunc | ios::out | ios::in | ios::binary);
     }
-
 }
